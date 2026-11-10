@@ -7,16 +7,15 @@ from core.config import settings
 
 # 1、全局 Prompt 模板没有网络连接，可以直接放在顶层
 prompt_template = """
-请使用以下提供的文本内容来回答问题。仅使用提供的文本信息。
-如果文本中没有相关信息，请回答"抱歉，提供的文本中没有这个信息"。
+    你是一个专业的企业客服助手。请严格根据下面提供的参考内容回答用户问题。
+    如果你不知道答案，请直接说“抱歉，提供的资料中没有相关信息”，千万不要自己编造。
 
-文本内容:
-{context}
+    【参考内容】
+    {context}
 
-问题: {question}
-
-回答:
-"""
+    【用户问题】
+    {question}
+    """
 prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
 
 # 使用 lru_cache 实现懒加载，且全局只实例化一次

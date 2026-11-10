@@ -26,3 +26,5 @@ logs/
 check_db.py
 
 *.log
+!.env.example
+uploads/

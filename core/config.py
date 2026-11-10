@@ -7,9 +7,9 @@ class GlobalSettings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
     secret_key: str     # 把这个写进环境变量，从环境变量中读
     token_expire_min: int = 30
-    api_key: str = Field(..., min_length=3)
-    dashscope_api_key: str = Field(..., min_length=3)
-    gaode_api_key: str = Field(..., min_length=3)
+    api_key: str = Field(..., min_length=3)     # deepseek
+    dashscope_api_key: str = Field(..., min_length=3)   # embedding
+    gaode_api_key: str = Field(..., min_length=3)   # 高德
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8',extra='ignore')
 

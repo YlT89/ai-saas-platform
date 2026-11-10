@@ -65,5 +65,7 @@ register_middlewares(app)
 
 # uvicorn main:app --reload
 
-# 如果注册账户出现问题的报错说没有这表的话，就重启服务器试试，如果不行就在终端输入这行代码，（注意：这句代码是强行把模型导入并建表，跑完一次就行）
-# python -c "from sqlmodel import SQLModel; from db.session import engine; import models.user, models.chat; SQLModel.metadata.create_all(bind=engine)"
+# 启动苦力，加上 --pool=solo 解决 Windows 兼容问题
+# celery -A core.RAG.celery_app.celery_app worker --loglevel=info --pool=solo
+
+# python -c "import redis; redis.Redis(host='localhost', port=6379, db=0).flushdb()"
