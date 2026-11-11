@@ -1,7 +1,5 @@
 fastapi
 uvicorn
-pydantic
-pydantic-settings
 langchain
 langchain-community
 langchain-classic
@@ -18,3 +16,4 @@ tiktoken
 python-jose[cryptography]
 passlib[bcrypt]
 fastapi-offline
+pydantic[all]
