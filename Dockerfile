@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 8000
 
 # 7. 启动命令：当容器启动时，执行 uvicorn 启动服务
-CMD ["uvicorn", "main9:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

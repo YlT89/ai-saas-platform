@@ -38,7 +38,7 @@ def process_document_task(file_path: str, kb_id: int):
             documents=texts,
             embedding=embeddings,
             index_name=index_name,
-            redis_url="redis://localhost:6379",
+            redis_url=f"redis://{os.getenv('REDIS_HOST', 'localhost')}:6379",
         )
 
         texts = text_splitter.split_documents(docs)
