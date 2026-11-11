@@ -16,4 +16,5 @@ tiktoken
 python-jose[cryptography]
 passlib[bcrypt]
 fastapi-offline
-pydantic[all]
+pydantic
+email-validator
