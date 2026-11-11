@@ -128,7 +128,7 @@ async def chat_kb(
     index_name = f"kb_index_{kb_id}"
 
     vector_store = RedisVectorStore(
-        redis_url=f"redis://{os.getenv('REDIS_HOST', 'localhost')}:6379",
+        redis_url=os.getenv("REDIS_URL", "redis://localhost:6379"),
         index_name=index_name,
         embeddings=embeddings
     )

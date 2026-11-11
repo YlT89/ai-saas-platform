@@ -38,7 +38,8 @@ def process_document_task(file_path: str, kb_id: int):
             documents=texts,
             embedding=embeddings,
             index_name=index_name,
-            redis_url=f"redis://{os.getenv('REDIS_HOST', 'localhost')}:6379",
+            # 默认本地 6379，Docker 环境自动变成 redis:6379
+            redis_url=os.getenv("REDIS_URL", "redis://localhost:6379"),
         )
 
         texts = text_splitter.split_documents(docs)
