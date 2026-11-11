@@ -18,3 +18,4 @@ passlib[bcrypt]
 fastapi-offline
 pydantic
 email-validator
+pydantic-settings
