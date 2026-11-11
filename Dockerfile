@@ -11,7 +11,9 @@ WORKDIR /app
 # 4. 先拷贝依赖清单，并安装依赖
 # 这样做的好处是：如果你只改了代码没改依赖，Docker 会自动使用缓存，不用重新下载依赖，极快！
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# 先升级 pip 本身，再使用清华源安装依赖
+RUN pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install --no-cache-dir -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 
 # 5. 拷贝项目里的所有代码到容器中
 COPY . .
