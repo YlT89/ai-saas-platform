@@ -21,3 +21,4 @@ langchain-redis
 langchain-text-splitters
 tiktoken
 numpy<2.0
+streamlit
