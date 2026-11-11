@@ -52,6 +52,8 @@ def get_weather(loc: str) -> str:
             else:
                 return json.dumps({'error': '未获取到预报数据'}, ensure_ascii=False)
         else:
-            return json.dumps({'error': f'高德API返回错误: {data.get('info')}'}, ensure_ascii=False)
+            error_msg = data.get('info')
+            return json.dumps({'error': f"高德API返回错误: {error_msg}"}, ensure_ascii=False)
     except Exception as e:
-        return json.dumps({'error': f'请求失败：{str(e)}'}, ensure_ascii=False)
+        error_str = str(e)
+        return json.dumps({'error': f"请求失败: {error_str}"}, ensure_ascii=False)
