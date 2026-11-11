@@ -5,8 +5,16 @@ pydantic-settings
 langchain
 langchain-community
 langchain-classic
+langchain-openai
+langchain-redis
+langchain-text-splitters
 celery
 redis
 sqlalchemy
+sqlmodel
 requests
 numpy<2.0
+tiktoken
+python-jose[cryptography]
+passlib[bcrypt]
+fastapi-offline
