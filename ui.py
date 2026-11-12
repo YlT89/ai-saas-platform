@@ -142,3 +142,4 @@ if question := st.chat_input('请输入你想问的问题...'):   # :=（海象�
                     st.session_state['chat_history'].append({'role': 'assistant', 'content': full_response})
         except Exception as e:
             st.error(f"服务器连接失败: {e}")
+

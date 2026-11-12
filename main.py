@@ -73,3 +73,4 @@ register_middlewares(app)
 
 # 前端页面
 # streamlit run ui.py
+# 去后端注册账号，拿Token、注册知识库
