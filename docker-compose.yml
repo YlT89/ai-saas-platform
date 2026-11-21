@@ -13,6 +13,7 @@ services:
       timeout: 3s
       retries: 5
       start_period: 10s
+    restart: always
 
   # 2. 后端 FastAPI
   backend:
@@ -34,6 +35,7 @@ services:
         condition: service_healthy   # 确保 Redis 健康后才启动
     volumes:
       - ./uploads:/app/uploads
+    restart: always
 
   # 3. 前端 Streamlit (假设你用的是 8501 端口)
   frontend:
@@ -50,6 +52,7 @@ services:
       - .env
     depends_on:
       - backend
+    restart: always
 
   # 4. Celery 异步任务
   worker:
@@ -67,6 +70,7 @@ services:
         condition: service_healthy
       backend:
         condition: service_started
+    restart: always
 
 volumes:
   redis_data:

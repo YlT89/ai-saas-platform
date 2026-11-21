@@ -1,0 +1,17 @@
+services:
+  backend:
+    volumes:
+      - ./:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - WATCHFILES_FORCE_POLLING=true
+
+  frontend:
+    volumes:
+      - ./:/app
+    command: streamlit run ui.py --server.port 8501 --server.address 0.0.0.0
+
+  worker:
+    volumes:
+      - ./:/app
+    command: celery -A core.RAG.celery_app.celery_app worker --loglevel=info
