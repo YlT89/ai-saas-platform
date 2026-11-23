@@ -67,6 +67,7 @@ services:
       - PYTHONPATH=/app:/backend
       - DB_URL=sqlite:////app/dev1.db
       - REDIS_URL=redis://redis:6379/1
+      - VECTOR_REDIS_URL=redis://redis:6379/0
     env_file:
       - .env
     depends_on:

@@ -38,8 +38,8 @@ def process_document_task(file_path: str, kb_id: int):
             documents=texts,
             embedding=embeddings,
             index_name=index_name,
-            # 默认本地 6379，Docker 环境自动变成 redis:6379
-            redis_url=os.getenv("REDIS_URL", "redis://localhost:6379"),
+            # 向量库固定用 0 号库，与 Celery broker（1 号库）分开
+            redis_url = os.getenv("VECTOR_REDIS_URL", "redis://localhost:6379/0")
         )
 
         texts = text_splitter.split_documents(docs)
