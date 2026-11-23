@@ -2,14 +2,14 @@
 from celery import Celery
 import os
 
-redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/1")
+# Celery broker/backend 固定用 1 号库，与向量库（0 号库）分离
+celery_redis_url = os.getenv("CELERY_REDIS_URL", "redis://localhost:6379/1")
 
-# REDIS_URL 由环境变量注入，已包含库号（worker 用 1，backend 用 0）
 celery_app = Celery(
     'sass_worker',
-    broker=redis_url,
-    backend=redis_url,
-    include=["core.RAG.tasks"]  # 告诉他去哪个文件找谁
+    broker=celery_redis_url,
+    backend=celery_redis_url,
+    include=["core.RAG.tasks"]      # 告诉他去哪个文件找谁
 )
 # 增加以下配置
 celery_app.conf.update(
