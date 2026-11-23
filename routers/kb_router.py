@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
 from sqlmodel import Session, select
 from langchain_redis import RedisVectorStore
 import shutil
@@ -17,6 +17,7 @@ from celery.result import AsyncResult
 from core.RAG.celery_app import celery_app
 from models.chat import ChatMessage
 from fastapi.responses import StreamingResponse
+from core.limiter import limiter
 
 
 
@@ -105,7 +106,9 @@ async def get_task_status(
 # 3. 进行 RAG 提问
 # ==========================================
 @kb_router.post("/{kb_id}/chat")
+@limiter.limit("5/minute")
 async def chat_kb(
+        request: Request,
         kb_id: int,
         req: ChatRequest,
         db: Session = Depends(get_db),

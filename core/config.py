@@ -6,7 +6,7 @@ class GlobalSettings(BaseSettings):
     db_url: str = 'sqlite:///./dev1.db'
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
     secret_key: str     # 把这个写进环境变量，从环境变量中读
-    token_expire_min: int = 30
+    token_expire_min: int = 120
     api_key: str = Field(..., min_length=3)     # deepseek
     dashscope_api_key: str = Field(..., min_length=3)   # embedding
     gaode_api_key: str = Field(..., min_length=3)   # 高德

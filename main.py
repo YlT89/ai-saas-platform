@@ -9,6 +9,9 @@ from db.session import engine
 from fastapi import Response
 from fastapi_offline import FastAPIOffline   # 下载本地Swagger页面
 # python -m pip install fastapi-offline
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from core.limiter import limiter
 
 # 这个只有运行的时候才会用到
 from models import User, Address, Order, ChatMessage, KB
@@ -37,6 +40,9 @@ app = FastAPIOffline(
 )
 
 # 文件传输国内那个CDN节点老有，BUG所以换成自己本地的
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 @app.get('/')
 def index():

@@ -5,6 +5,7 @@ import tiktoken
 from langchain_openai import ChatOpenAI
 from langchain_classic.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate
+from fastapi import Request
 
 # 导入项目内的依赖
 from db.session import get_db
@@ -14,6 +15,7 @@ from models.chat import ChatMessage
 from schemas.chat_schemas import ChatRequest
 from core.config import settings
 from core.Tookls.weather import get_weather
+from core.limiter import limiter
 
 
 
@@ -42,7 +44,9 @@ chat_router = APIRouter(prefix="/chat", tags=["AI 对话"])
 
 
 @chat_router.post("/ask")
+@limiter.limit("5/minute")  # 每个IP最多五分钟
 async def chat_with_ai(
+        request: Request,
         req: ChatRequest,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_active_user)  # 鉴权：只允许登录用户提问
