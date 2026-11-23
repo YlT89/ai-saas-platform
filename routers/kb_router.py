@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request, status
 from sqlmodel import Session, select
 from langchain_redis import RedisVectorStore
 import shutil
