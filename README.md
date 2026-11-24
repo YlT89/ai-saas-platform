@@ -1,3 +1,5 @@
+![项目演示](docs/流式输出.gif)
+![项目演示](docs/异步切分.gif)
 # 🧠 AI-SaaS-Platform (企业级 AI 知识库 SaaS 平台)
 
 本项目是一个基于 **FastAPI + LangChain + Streamlit** 构建的完整企业级 AI SaaS 平台。从最初的基础分层脚手架，逐步演进为具备多租户隔离、异步任务队列、RAG 知识库检索以及流式对话的生产级应用。

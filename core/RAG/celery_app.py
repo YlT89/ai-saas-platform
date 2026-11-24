@@ -3,7 +3,7 @@ from celery import Celery
 import os
 
 # Celery broker/backend 固定用 1 号库，与向量库（0 号库）分离
-celery_redis_url = os.getenv("CELERY_REDIS_URL", "redis://localhost:6379/1")
+celery_redis_url = os.getenv("CELERY_REDIS_URL", "redis://redis:6379/1")
 
 celery_app = Celery(
     'sass_worker',
