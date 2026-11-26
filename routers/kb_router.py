@@ -1,9 +1,7 @@
 import os
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request, status
 from sqlmodel import Session, select
-from langchain_redis import RedisVectorStore
 import shutil
-import redis
 
 from db.session import get_db
 from models.user import User
@@ -19,8 +17,7 @@ from core.RAG.celery_app import celery_app
 from models.chat import ChatMessage
 from fastapi.responses import StreamingResponse
 from core.limiter import limiter
-from core.RAG.rerank_app import rerank_text
-from core.config import settings
+from core.RAG.workflow import rag_graph
 
 
 
@@ -131,47 +128,33 @@ async def chat_kb(
     ).all()
     history_records.reverse()
 
-    index_name = f"kb_index_{kb_id}"
+    # 1. 构造初始状态
+    initial_state = {
+        "question": req.question,
+        "kb_id": kb_id,
+        "embeddings": embeddings,
+        "history": history_records
+    }
 
-    vector_store = RedisVectorStore(
-        redis_client = redis.Redis.from_url(settings.redis_url),
-        index_name=index_name,
-        embeddings=embeddings
-    )
-    # 如果没报错，再去检索
-    retriever = vector_store.as_retriever(search_kwargs={"k": 3})
-    docs = retriever.invoke(req.question)
+    # 2. 执行图
+    result = await rag_graph.ainvoke(initial_state)
 
-    #  把文档提取成纯文本列表
-    doc_texts = [doc.page_content for doc in docs]
-
-    # 调用 API 进行重排
-    reranked_texts = rerank_text(req.question, doc_texts)
-
-
-    # 拼接上下文（用从配置文件导入的模板）
-    context_text = "\n".join(reranked_texts) if reranked_texts else "（知识库中暂无相关内容）"
-
-
-    # 1. 系统提示词：只放背景规则和检索到的资料，不要把用户问题混进去
-    system_prompt = prompt_template.format(context=context_text, question="")
-
-    # 2. 开始组装消息列表
-    messages = [
-        {"role": "system", "content": system_prompt}
-    ]
-
-    # 3. 加入历史记录 (排在过去)
-    for msg in history_records:
-        messages.append({"role": msg.role_type, "content": msg.content})
-
-    # 4. 最后，在末尾加上用户刚刚提的这一个问题
-    messages.append({"role": "user", "content": req.question})
-
+    # 3. 拿结果（取图里返回的 context）
+    context_text = result["context"]
 
     async def stream_generator():
         full_ai_response = ""
         try:
+            # 1. 在这里重组 system_prompt（利用查回来的 context_text）
+            system_prompt = prompt_template.format(context=context_text, question=req.question)
+
+            # 2. 组装 messages：系统提示词 + 历史对话 + 当前提问
+            messages = [{"role": "system", "content": system_prompt}]
+            for msg in history_records:
+                messages.append({"role": msg.role_type, "content": msg.content})
+            # messages.append({"role": "user", "content": req.question})
+
+            # 3. 把整装待发的 messages 传给大模型
             async for chunk in llm.astream(messages):
                 content = chunk.content
                 if content:

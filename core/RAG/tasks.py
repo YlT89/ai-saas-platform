@@ -27,7 +27,12 @@ def process_document_task(file_path: str, kb_id: int):
         docs = loader.load()
 
         # 2、切分
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50, length_function=len)
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=300,
+            chunk_overlap=50,
+            length_function=len,
+            separators=["\n\n", "\n", "。", "！", "？", "，", " ", ""]  # 优先按段落、句号切，最后才是按字切
+        )
         texts = text_splitter.split_documents(docs)
 
         # 3、向量化入库

@@ -23,7 +23,7 @@ __pycache__/
 logs/
 
 *.pyc
-check_db.py
+Detection/check_db.py
 
 *.log
 !.env.example
