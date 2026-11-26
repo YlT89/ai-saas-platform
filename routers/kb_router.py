@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Request
 from sqlmodel import Session, select
 from langchain_redis import RedisVectorStore
 import shutil
+import redis
 
 from db.session import get_db
 from models.user import User
@@ -18,6 +19,8 @@ from core.RAG.celery_app import celery_app
 from models.chat import ChatMessage
 from fastapi.responses import StreamingResponse
 from core.limiter import limiter
+from core.RAG.rerank_app import rerank_text
+from core.config import settings
 
 
 
@@ -131,7 +134,7 @@ async def chat_kb(
     index_name = f"kb_index_{kb_id}"
 
     vector_store = RedisVectorStore(
-        redis_url=os.getenv("REDIS_URL", "redis://localhost:6379"),
+        redis_client = redis.Redis.from_url(settings.redis_url),
         index_name=index_name,
         embeddings=embeddings
     )
@@ -139,10 +142,15 @@ async def chat_kb(
     retriever = vector_store.as_retriever(search_kwargs={"k": 3})
     docs = retriever.invoke(req.question)
 
+    #  把文档提取成纯文本列表
+    doc_texts = [doc.page_content for doc in docs]
+
+    # 调用 API 进行重排
+    reranked_texts = rerank_text(req.question, doc_texts)
 
 
     # 拼接上下文（用从配置文件导入的模板）
-    context_text = "\n\n".join([doc.page_content for doc in docs])
+    context_text = "\n".join(reranked_texts) if reranked_texts else "（知识库中暂无相关内容）"
 
 
     # 1. 系统提示词：只放背景规则和检索到的资料，不要把用户问题混进去

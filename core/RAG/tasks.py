@@ -39,7 +39,8 @@ def process_document_task(file_path: str, kb_id: int):
             embedding=embeddings,
             index_name=index_name,
             # 向量库固定用 0 号库，与 Celery broker（1 号库）分开
-            redis_url = os.getenv("VECTOR_REDIS_URL", "redis://redis:6379/0")
+            # 强制从环境变量读取，不设死默认值，防止串台
+            redis_url = os.getenv("REDIS_URL", "redis://localhost:6380/0")
         )
 
         texts = text_splitter.split_documents(docs)
