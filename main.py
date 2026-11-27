@@ -74,6 +74,9 @@ register_middlewares(app)
 # 启动苦力，加上 --pool=solo 解决 Windows 兼容问题
 # celery -A core.RAG.celery_app.celery_app worker --loglevel=info --pool=solo
 
+# 启动Redis
+# docker run -d --name saas-redis-local -p 6380:6379 -v D:\DockerData\saas-redis:/data -e REDIS_ARGS="--appendonly yes --protected-mode no" redis/redis-stack-server:latest
+
 # 删除文本
 # python -c "import redis; redis.Redis(host='localhost', port=6379, db=0).flushdb()"
 

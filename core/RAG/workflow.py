@@ -1,15 +1,19 @@
 from typing import TypedDict
 from langgraph.graph import StateGraph, END
 from langchain_redis import RedisVectorStore
+from langgraph.checkpoint.memory import MemorySaver
 
 from core.RAG.rerank_app import rerank_text
 from core.config import settings
+from core.RAG.ai_config import get_embeddings
+
+# 实例化记忆存储器
+memory = MemorySaver()
 
 # 1. 定义真实状态（带上必要的参数）
 class AgentState(TypedDict):
     question: str
     kb_id: int
-    embeddings: any  # 把模型对象传进来
     history: list
     context: str
     answer: str
@@ -21,10 +25,11 @@ def retrieve_node(state: AgentState):
     vector_store = RedisVectorStore(
         redis_url=settings.redis_url,
         index_name=f"kb_index_{state['kb_id']}",
-        embeddings=state["embeddings"]
+        embeddings=get_embeddings()  # 直接现用现取
     )
     retriever = vector_store.as_retriever(search_kwargs={"k": 3})
     docs = retriever.invoke(state["question"])
+    print(f"【DEBUG 1】检索到了几条: {len(docs)}")  # 加上这行
 
 
     # 提取文本
@@ -66,4 +71,5 @@ workflow.set_conditional_entry_point(route_question)
 workflow.add_edge("retrieve", END)
 workflow.add_edge("direct_reply", END)
 
-rag_graph = workflow.compile()
+# 编译图时挂上记忆
+rag_graph = workflow.compile(checkpointer=memory)

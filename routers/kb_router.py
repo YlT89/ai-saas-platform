@@ -114,7 +114,6 @@ async def chat_kb(
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user),
         llm=Depends(get_llm),  # 用依赖注入拿实例
-        embeddings=Depends(get_embeddings)  # 用依赖注入拿实例
 ):
     kb = db.get(KB, kb_id)
     if not kb or kb.user_id != current_user.id:
@@ -132,12 +131,12 @@ async def chat_kb(
     initial_state = {
         "question": req.question,
         "kb_id": kb_id,
-        "embeddings": embeddings,
         "history": history_records
     }
 
     # 2. 执行图
-    result = await rag_graph.ainvoke(initial_state)
+    config = {"configurable": {"thread_id": f"user_{current_user.id}_kb_{kb_id}"}}  # 每个用户+库，独立记忆
+    result = await rag_graph.ainvoke(initial_state, config=config)
 
     # 3. 拿结果（取图里返回的 context）
     context_text = result["context"]
